@@ -1,17 +1,20 @@
+//import liraries
+import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import uuid from 'react-native-uuid';
 import {Input, Button, Radio, RadioGroup} from '@ui-kitten/components';
 import {Formik} from 'formik';
-import {taskSchema} from '../../utils/validation';
 import CustomDatePicker from '../../components/uı/customDatePicker';
-import {status} from '../../utils/constants';
+import {taskSchema} from '../../utils/validations';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {status} from '../../utils/constants';
 const AddTask = () => {
   const saveTask = async values => {
     try {
-      await AsyncStorage.setItem('task', JSON.stringify(values));
-      console.log('başarılı');
+      const savedTasks = await AsyncStorage.getItem('tasks');
+      let myTask = savedTasks ? JSON.parse(savedTasks) : [];
+      myTask.push(values);
+      await AsyncStorage.setItem('tasks', JSON.stringify(myTask));
     } catch (e) {
       console.log(e);
     }
@@ -21,8 +24,8 @@ const AddTask = () => {
       <Formik
         initialValues={{
           id: uuid.v4(),
-          description: '',
-          title: '',
+          description: 'Yazılım ile ilgili ders çalışılacak',
+          title: 'Yazılım Dersi',
           startDate: null,
           endDate: null,
           category: null,
@@ -91,11 +94,13 @@ const AddTask = () => {
   );
 };
 
-export default AddTask;
-
+// define your styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 15,
   },
 });
+
+//make this component available to the app
+export default AddTask;
